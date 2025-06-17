@@ -141,7 +141,7 @@ class SlackController extends Controller
             $isUser = $request->type === 'user';
 
             if ($isUser) {
-                $openResponse = Http::withToken(session('slack_access_token'))
+                $openResponse = Http::withToken(auth()->user()->account->slack_access_token)
                     ->post('https://slack.com/api/conversations.open', [
                         'users' => $channelId
                     ]);
@@ -154,7 +154,7 @@ class SlackController extends Controller
                 $channelId = $openData['channel']['id'];
             }
             else {
-                $joinResponse = Http::withToken(session('slack_access_token'))
+                $joinResponse = Http::withToken(auth()->user()->account->slack_access_token)
                     ->post('https://slack.com/api/conversations.join', [
                         'channel' => $channelId
                     ]);
@@ -166,7 +166,7 @@ class SlackController extends Controller
                 }
             }
 
-            $response = Http::withToken(session('slack_access_token'))
+            $response = Http::withToken(auth()->user()->account->slack_access_token)
                 ->get('https://slack.com/api/conversations.history', [
                     'channel' => $channelId,
                     'limit' => 50
@@ -192,7 +192,7 @@ class SlackController extends Controller
 
             $users = collect($userIds)
                 ->mapWithKeys(function ($userId) {
-                    $userResponse = Http::withToken(session('slack_access_token'))
+                    $userResponse = Http::withToken(auth()->user()->account->slack_access_token)
                         ->get('https://slack.com/api/users.info', ['user' => $userId]);
 
                     $userData = $userResponse->json();
@@ -240,7 +240,6 @@ class SlackController extends Controller
         try {
             $message = $request->text;
 
-            // استبدال المنشنز بشكل صحيح
             $message = preg_replace_callback('/<@([^|>]+)\|([^>]+)>/', function($matches) {
                 return "<@{$matches[1]}>";
             }, $message);
@@ -248,7 +247,7 @@ class SlackController extends Controller
             $channelId = $request->conversation;
 
             if ($request->type === 'user') {
-                $conversationResponse = Http::withToken(session('slack_access_token'))
+                $conversationResponse = Http::withToken(auth()->user()->account->slack_access_token)
                     ->post('https://slack.com/api/conversations.open', [
                         'users' => $channelId,
                         'return_im' => true
@@ -276,7 +275,7 @@ class SlackController extends Controller
                 $messageData['username'] = env('SLACK_BOT_NAME');
             }
 
-            $response = Http::withToken(session('slack_access_token'))
+            $response = Http::withToken(auth()->user()->account->slack_access_token)
                 ->post('https://slack.com/api/chat.postMessage', $messageData);
 
             $responseData = $response->json();
