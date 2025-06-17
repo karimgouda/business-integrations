@@ -1,0 +1,23 @@
+.notify {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.notify-success {
+    background-color: #48bb78;
+    border-left: 4px solid #2f855a;
+}
+
+.notify-error {
+    background-color: #f56565;
+    border-left: 4px solid #c53030;
+}
+
+.notify-info {
+    background-color: #4299e1;
+    border-left: 4px solid #3182ce;
+}
+
+.notify-warning {
+    background-color: #ed8936;
+    border-left: 4px solid #dd6b20;
+}

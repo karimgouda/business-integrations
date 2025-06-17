@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 class SlackUserService
 {
-    public function syncSlackUsers()
+    public function syncSlackUsers($accountId)
     {
         $accessToken = session('slack_access_token');
 
@@ -30,7 +30,8 @@ class SlackUserService
                     'slack_name' => $slackUser['name'],
                     'slack_avatar' => $slackUser['profile']['image_48'] ?? null,
                     'is_slack_user' => true,
-                    'password' => bcrypt(Str::random(32))
+                    'password' => bcrypt('12345678'),
+                    'account_id'=>$accountId
                 ]
             );
         }

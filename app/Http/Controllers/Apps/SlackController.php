@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Apps;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account;
 use App\Models\User;
 use App\Services\SlackUserService;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ class SlackController extends Controller
         $clientId = env('SLACK_CLIENT_ID');
         $clientSecret = env('SLACK_CLIENT_SECRET');
 
-        $redirectUri = 'https://99e0-105-197-96-252.ngrok-free.app/slack/oauth/callback';
+        $redirectUri = 'https://bb99-105-197-88-5.ngrok-free.app/slack/oauth/callback';
 
         try {
             $response = Http::asForm()->post('https://slack.com/api/oauth.v2.access', [
@@ -41,16 +42,18 @@ class SlackController extends Controller
                 return redirect('/')->with('error', "Slack connection failed: $errorMsg");
             }
 
-            session([
+           $account =  Account::create([
+               'account_name'=>$data['team']['name'],
                 'slack_access_token' => $data['access_token'],
                 'slack_user_id' => $data['authed_user']['id'] ?? null,
                 'slack_team_id' => $data['team']['id'] ?? null,
                 'slack_team_name' => $data['team']['name'] ?? null
             ]);
-
-            return redirect('/slack/chat');
+            $id = $account->id;
+            return redirect("/slack/chat?account_id=$id");
 
         } catch (\Exception $e) {
+            dd($e->getMessage());
             return redirect('/')->with('error', 'Failed to connect with Slack: ' . $e->getMessage());
         }
     }
@@ -64,17 +67,20 @@ class SlackController extends Controller
 
     }
 
-    public function slackChat()
+    public function slackChat(Request $request)
     {
-        if (!session()->has('slack_access_token')) {
+
+        $user = auth()->user();
+        if (is_null($user)  || empty($user->account->slack_access_token)) {
             return redirect('/')->with('error', 'Please connect to Slack first');
         }
 
         try {
-            $slackService = new SlackUserService();
-            $slackService->syncSlackUsers();
 
-            $accessToken = session('slack_access_token');
+            $slackService = new SlackUserService();
+            $slackService->syncSlackUsers($request->account_id);
+
+            $accessToken = $user->account->slack_access_token;
             $channelsResponse = Http::withToken($accessToken)
                 ->post('https://slack.com/api/conversations.list', [
                     'types' => 'public_channel,private_channel',
