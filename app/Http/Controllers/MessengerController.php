@@ -10,8 +10,13 @@ class MessengerController extends Controller
 {
     public function verifyWebhook(Request $request)
     {
-        $data = $request->all();
-       Log::info('receive webhook'.$data);
+        $verify_token = env('FB_MESSENGER_VERIFY_TOKEN');
+
+        if ($request->input('hub.verify_token') === $verify_token) {
+           Log::info('resave:'.$verify_token);
+        }
+
+        Log::info('resave:'.$verify_token);
     }
 
     public function handleWebhook(Request $request)
