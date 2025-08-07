@@ -163,8 +163,8 @@
 </div>
 
 <!-- Messenger OAuth Modal -->
-<div id="messengerModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
-    <div class="bg-white rounded-lg p-6 max-w-md w-full">
+<div id="messengerModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full shadow-lg">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-xl font-bold text-gray-900">Connect Messenger</h3>
             <button onclick="closeMessengerModal()" class="text-gray-500 hover:text-gray-700">
@@ -172,12 +172,50 @@
             </button>
         </div>
         <p class="text-gray-600 mb-6">Click the button below to authorize our app to access your Facebook Page messages.</p>
-        <a href=""
-           class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center font-medium py-2 px-4 rounded-md transition-colors">
-            <i class="fab fa-facebook-messenger mr-2"></i> Authorize Messenger
-        </a>
+
+        <button onclick="generateToken()"
+                class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center font-medium py-2 px-4 rounded-md transition-colors mb-4">
+            <i class="fab fa-facebook-messenger mr-2"></i> Generate Access Token
+        </button>
+
+        <div id="tokenWrapper" class="hidden flex items-center gap-2">
+            <input id="generatedToken"
+                   type="text"
+                   readonly
+                   class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-700 bg-gray-100 focus:outline-none">
+            <button onclick="copyToken()"
+                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm">
+                Copy
+            </button>
+        </div>
     </div>
 </div>
+
+
+<script>
+    function generateToken() {
+        const token = Math.random().toString(36).substr(2, 10) + Date.now().toString(36);
+        const input = document.getElementById('generatedToken');
+        const wrapper = document.getElementById('tokenWrapper');
+
+        input.value = token;
+        wrapper.classList.remove('hidden');
+    }
+
+    function copyToken() {
+        const input = document.getElementById('generatedToken');
+        input.select();
+        input.setSelectionRange(0, 99999);
+
+        document.execCommand("copy");
+
+        alert("Token copied to clipboard!");
+    }
+
+    function closeMessengerModal() {
+        document.getElementById('messengerModal').classList.add('hidden');
+    }
+</script>
 
 <script>
     function connectSlack() {

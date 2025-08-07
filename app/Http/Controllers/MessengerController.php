@@ -4,19 +4,14 @@ namespace App\Http\Controllers;
 
 use Facebook\Facebook;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class MessengerController extends Controller
 {
     public function verifyWebhook(Request $request)
     {
-        $verifyToken = env('MESSENGER_VERIFY_TOKEN');
-
-        if ($request->hub_mode === 'subscribe' &&
-            $request->hub_verify_token === $verifyToken) {
-            return response($request->hub_challenge, 200);
-        }
-
-        return response('Invalid verification token', 403);
+        $data = $request->all();
+       Log::info('receive webhook'.$data);
     }
 
     public function handleWebhook(Request $request)
