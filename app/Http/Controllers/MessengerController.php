@@ -16,6 +16,7 @@ class MessengerController extends Controller
 
     public function handleWebhook(Request $request)
     {
+
         $data = $request->all();
 
         \Log::info('Webhook received:', $data);
